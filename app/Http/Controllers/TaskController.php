@@ -4,21 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
-use MongoDB\Driver\Manager as Manager;
-use MongoDB\Driver\Command as Command;
-use MongoDB\Driver\Query as Query;
 use MongoDB\Client as Client;
+use MongoDB\BSON\ObjectId as ObjectId;
 
 class TaskController extends Controller
 {
     public function index()
     {
-        $connection = new Manager("mongodb://localhost:27017");
-        $query = new Query([]);
-        $data = $connection->executeQuery("LaravelCRUD.Tasks", $query);
-        $tasks = $data->toArray();
+        $collection = (new Client)->LaravelCRUD->Tasks;
+        $tasks = $collection->find();
         return view('task.index', ['tasks'=>$tasks]);
-
     }
     public function create()
     {
@@ -32,9 +27,11 @@ class TaskController extends Controller
         ]);
         return redirect(route('task.index'));
     }
-    public function show(Task $task)
+    public function show($task)
     {
-        //
+        $collection = (new Client)->LaravelCRUD->Tasks;
+        $task = $collection->findOne(['_id' => new ObjectId("$task")]);
+        return view('task.show', ['task'=>$task]);
     }
     public function edit(Task $task)
     {
@@ -46,8 +43,10 @@ class TaskController extends Controller
         //
     }
 
-    public function destroy(Task $task)
+    public function destroy($task)
     {
-        //
+        $collection = (new Client)->LaravelCRUD->Tasks;
+        $collection->deleteOne(['_id' => new ObjectId("$task")]);
+        return redirect(route('task.index'));
     }
 }
