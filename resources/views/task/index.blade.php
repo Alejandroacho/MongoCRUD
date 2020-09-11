@@ -4,7 +4,7 @@
         <div class="card">
             <div class="card-header">
                 <h1>Tasks</h1><hr>
-                <a href="#" class="btn btn-secondary">Add New</a>
+                <a href="{{Route('task.create')}}" class="btn btn-success">Add New</a>
             </div>
             <table class="table table-triped">
                 <thead>

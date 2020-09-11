@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use MongoDB\Driver\Manager as Manager;
 use MongoDB\Driver\Command as Command;
 use MongoDB\Driver\Query as Query;
+use MongoDB\Client as Client;
 
 class TaskController extends Controller
 {
@@ -21,11 +22,15 @@ class TaskController extends Controller
     }
     public function create()
     {
-        //
+        return view('task.create');
     }
     public function store(Request $request)
     {
-        //
+        $collection = (new Client)->LaravelCRUD->Tasks;
+        $collection->insertOne([
+            'name' => $request->name
+        ]);
+        return redirect(route('task.index'));
     }
     public function show(Task $task)
     {
