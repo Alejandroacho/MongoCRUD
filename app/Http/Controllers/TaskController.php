@@ -11,13 +11,13 @@ class TaskController extends Controller
 {
     function __construct ()
     {
-        $this->connection = new Client("mongodb://localhost:27017");
+        $connection = new Client("mongodb://localhost:27017");
+        $this->collection = $connection->LaravelCRUD->Tasks;
     }
 
     public function index()
     {
-        $collection = $this->connection->LaravelCRUD->Tasks;
-        $tasks = $collection->find();
+        $tasks = $this->collection->find();
         return view('task.index', ['tasks'=>$tasks]);
     }
     public function create()
@@ -26,29 +26,25 @@ class TaskController extends Controller
     }
     public function store(Request $request)
     {
-        $collection = $this->connection->LaravelCRUD->Tasks;
-        $collection->insertOne([
+        $this->collection->insertOne([
             'name' => $request->name
         ]);
         return redirect(route('task.index'));
     }
     public function show($task)
     {
-        $collection = $this->connection->LaravelCRUD->Tasks;
-        $task = $collection->findOne(['_id' => new ObjectId("$task")]);
+        $task = $this->collection->findOne(['_id' => new ObjectId("$task")]);
         return view('task.show', ['task'=>$task]);
     }
     public function edit($task)
     {
-        $collection = $this->connection->LaravelCRUD->Tasks;
-        $task = $collection->findOne(['_id' => new ObjectId("$task")]);
+        $task = $this->collection->findOne(['_id' => new ObjectId("$task")]);
         return view('task.edit', ['task'=>$task]);
     }
 
     public function update(Request $request, $task)
     {
-        $collection = $this->connection->LaravelCRUD->Tasks;
-        $collection->updateOne(
+        $this->collection->updateOne(
             ['_id' => new ObjectId("$task")],
             ['$set'=>['name'=>$request->name]]
         );
@@ -57,8 +53,7 @@ class TaskController extends Controller
 
     public function destroy($task)
     {
-        $collection = $this->connection->LaravelCRUD->Tasks;
-        $collection->deleteOne(['_id' => new ObjectId("$task")]);
+        $this->collection->deleteOne(['_id' => new ObjectId("$task")]);
         return redirect(route('task.index'));
     }
 }
