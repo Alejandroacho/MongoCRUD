@@ -9,9 +9,14 @@ use MongoDB\BSON\ObjectId as ObjectId;
 
 class TaskController extends Controller
 {
+    function __construct ()
+    {
+        $this->connection = new Client("mongodb://localhost:27017");
+    }
+
     public function index()
     {
-        $collection = (new Client)->LaravelCRUD->Tasks;
+        $collection = $this->connection->LaravelCRUD->Tasks;
         $tasks = $collection->find();
         return view('task.index', ['tasks'=>$tasks]);
     }
@@ -21,7 +26,7 @@ class TaskController extends Controller
     }
     public function store(Request $request)
     {
-        $collection = (new Client)->LaravelCRUD->Tasks;
+        $collection = $this->connection->LaravelCRUD->Tasks;
         $collection->insertOne([
             'name' => $request->name
         ]);
@@ -29,23 +34,30 @@ class TaskController extends Controller
     }
     public function show($task)
     {
-        $collection = (new Client)->LaravelCRUD->Tasks;
+        $collection = $this->connection->LaravelCRUD->Tasks;
         $task = $collection->findOne(['_id' => new ObjectId("$task")]);
         return view('task.show', ['task'=>$task]);
     }
-    public function edit(Task $task)
+    public function edit($task)
     {
-        //
+        $collection = $this->connection->LaravelCRUD->Tasks;
+        $task = $collection->findOne(['_id' => new ObjectId("$task")]);
+        return view('task.edit', ['task'=>$task]);
     }
 
-    public function update(Request $request, Task $task)
+    public function update(Request $request, $task)
     {
-        //
+        $collection = $this->connection->LaravelCRUD->Tasks;
+        $collection->updateOne(
+            ['_id' => new ObjectId("$task")],
+            ['$set'=>['name'=>$request->name]]
+        );
+        return redirect(route('task.index'));
     }
 
     public function destroy($task)
     {
-        $collection = (new Client)->LaravelCRUD->Tasks;
+        $collection = $this->connection->LaravelCRUD->Tasks;
         $collection->deleteOne(['_id' => new ObjectId("$task")]);
         return redirect(route('task.index'));
     }
