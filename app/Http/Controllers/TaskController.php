@@ -12,7 +12,7 @@ class TaskController extends Controller
     function __construct ()
     {
         $connection = new Client("mongodb://localhost:27017");
-        $this->collection = $connection->LaravelCRUD->Tasks;
+        $this->collection = $connection->LaravelCRUD->task;
     }
 
     public function index()
